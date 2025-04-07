@@ -114,11 +114,11 @@ class DeploymentManager(Monitor):
             workflow_info = None
         else:
             workflow_info = json.loads(workflow_info_raw)
-            current_time = datetime.now(GLOBAL_TIME_ZONE)
-            next_check = datetime.strptime(workflow_info["next_check"], TIME_FORMAT)
-            if current_time < next_check:
-                logger.info("Not enough time has passed since the last check")
-                return
+            # current_time = datetime.now(GLOBAL_TIME_ZONE)
+            # next_check = datetime.strptime(workflow_info["next_check"], TIME_FORMAT)
+            # if current_time < next_check:
+            #     logger.info("Not enough time has passed since the last check")
+            #     return
 
         self.workflow_collector.run_on_workflow(workflow_id)
 
@@ -133,6 +133,8 @@ class DeploymentManager(Monitor):
         total_invocation_counts_since_last_solved = self._get_total_invocation_counts_since_last_solved(
             workflow_summary, last_solved
         )
+        print(f"Total invocation counts since last solved: {total_invocation_counts_since_last_solved}")
+        print(f"For workflow: {workflow_id}")
 
         # The solver has never been run before for this workflow, and the workflow has not been invoked enough
         # collect more data and wait
@@ -171,6 +173,7 @@ class DeploymentManager(Monitor):
         else:
             # Invoke / run the deployment manager solve locally
             self.run_deployment_algorithm(workflow_id, solve_hours, leftover_tokens)
+        self.run_deployment_algorithm(workflow_id, solve_hours, 10000)
 
     def run_deployment_algorithm(self, workflow_id: str, solve_hours: list[str], leftover_tokens: int) -> None:
         logger.info(f"Running deployment algorithm with solve hours: {solve_hours}")

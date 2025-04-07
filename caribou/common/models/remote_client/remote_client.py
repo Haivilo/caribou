@@ -76,6 +76,7 @@ class RemoteClient(ABC):  # pylint: disable=too-many-public-methods
             # still sent to the function using the messaging service upon calling
             # (so the workflow placement information is still forwarded)
             message_dictionary = json.loads(message)
+            # print("message_dictionary", message_dictionary)
             if "payload" not in message_dictionary:
                 payload = ""
             payload = message_dictionary["payload"]
@@ -110,6 +111,7 @@ class RemoteClient(ABC):  # pylint: disable=too-many-public-methods
         try:
             if sync and alternative_message is not None:
                 message = alternative_message
+            print("sns real message", message)
 
             self.send_message_to_messaging_service(identifier, message)
         except Exception as e:

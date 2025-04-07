@@ -22,6 +22,7 @@ class AWSLatencyRetriever(LatencyRetriever):
             cloud_ping_page = requests.get(cloud_ping_url, timeout=10)
 
             soup = BeautifulSoup(cloud_ping_page.content, "html.parser")
+            breakpoint()
 
             parsed_table = self._parse_table(soup)
 

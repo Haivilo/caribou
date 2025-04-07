@@ -1,6 +1,7 @@
 import math
 import os
 import time
+import random
 from datetime import datetime, timedelta
 from functools import partial
 from typing import Any, Callable, Optional
@@ -43,9 +44,21 @@ class CarbonRetriever(DataRetriever):  # pylint: disable=too-many-instance-attri
 
         self._carbon_intensity_cache: dict[tuple[float, float], float] = {}
 
+    def get_random_uae_coordinates(self) -> tuple[float, float]:
+        if random.randint(0, 1) == 0:
+            return 25.2048, 55.2708  # Dubai
+        else:
+            return 24.4539, 54.3773  # Abu Dhabi
+
     def retrieve_carbon_region_data(self) -> dict[str, dict[str, Any]]:
         result_dict: dict[str, dict[str, Any]] = {}
+    
         for region_key, available_region in self._available_regions.items():
+            # Generate random UAE coordinates
+            lat, lon = self.get_random_uae_coordinates()
+            available_region['latitude'] = lat
+            available_region['longitude'] = lon
+        
             # We have 2 methods to retrieve the carbon intensity
             # One is overall average carbon intensity
             # Another one is hourly average carbon intensity
@@ -54,7 +67,7 @@ class CarbonRetriever(DataRetriever):  # pylint: disable=too-many-instance-attri
             overall_average_data = self._get_execution_carbon_intensity(
                 available_region, self._get_overall_average_carbon_intensity
             )
-
+        
             if overall_average_data is None:
                 continue
 
@@ -206,6 +219,7 @@ class CarbonRetriever(DataRetriever):  # pylint: disable=too-many-instance-attri
     def _get_raw_carbon_intensity_history_range(
         self, latitude: float, longitude: float, start_timestamp: str, end_timestamp: str
     ) -> list[dict[str, str]]:
+        # breakpoint()
         electricitymaps = "https://api-access.electricitymaps.com/free-tier/carbon-intensity/past-range?"
 
         if (datetime.now(GLOBAL_TIME_ZONE) - self._last_request).total_seconds() < self._request_backoff:
@@ -227,7 +241,11 @@ class CarbonRetriever(DataRetriever):  # pylint: disable=too-many-instance-attri
             headers={"auth-token": self._electricity_maps_auth_token},
             timeout=10,
         )
-
+        print("response", response.text)
+        print("response.status_code", response.status_code)
+        # breakpoint()
+        if response.status_code != 200:
+            print("response", response.text)
         self._last_request = datetime.now(GLOBAL_TIME_ZONE)
 
         result: list[dict[str, str]] = []

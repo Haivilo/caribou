@@ -98,6 +98,7 @@ class DeploymentAlgorithm(ABC):  # pylint: disable=too-many-instance-attributes
         # The solver for every hour must terminate in `timeout_per_hour` seconds
         timeout_per_hour = self._timeout / len(hours_to_run)
         for hour_to_run in hours_to_run:
+            print(f"Running solver for hour {hour_to_run}")
             self._update_data_for_new_hour(hour_to_run)
             deployments = self._run_algorithm(timeout=timeout_per_hour)
             ranked_deployments = self._ranker.rank(deployments)

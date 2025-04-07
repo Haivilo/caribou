@@ -26,6 +26,7 @@ class DeploymentMigrator(Monitor):
                 WORKFLOW_PLACEMENT_SOLVER_STAGING_AREA_TABLE
             )
         )
+        breakpoint()
         for workflow_id in updated_workflow_placements:
             logger.info(f"Initializing redeploying workflow: {workflow_id}")
             if self._deployed_remotely:
